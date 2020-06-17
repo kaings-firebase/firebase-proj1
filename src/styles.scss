@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+  font-family: 'Source Code Pro', monospace;
+  color: #1f1f1f;
+}
+
+.bg-warning {
+  background-color: #ffc107;
+}
+
+.border-warning {
+  border: 1px solid #ffc107;
+}
+
+a:hover {
+  cursor: pointer;
+}
