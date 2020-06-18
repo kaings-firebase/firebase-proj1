@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import { firebaseConfig } from 'secret';
 
 @Component({
   selector: 'main-nav',
@@ -12,4 +15,9 @@ export class MainNavComponent implements OnInit {
   ngOnInit() {
   }
 
+  SignOut() {
+    firebase.auth().signOut()
+    .then((res) => {console.log('signout_res..... ', res)})
+    .catch((err) => {console.error('signout_err..... ', err)});
+  }
 }
