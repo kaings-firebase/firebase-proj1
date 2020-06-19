@@ -12,6 +12,15 @@ body {
   border: 1px solid #ffc107;
 }
 
-a:hover {
-  cursor: pointer;
+a:not(.btn) {
+  &:hover {
+    cursor: pointer;
+    color: #dc3545 !important;
+  }
+}
+
+.card {
+  &:hover {
+    border-color: #dc3545;
+  }
 }
