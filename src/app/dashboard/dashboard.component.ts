@@ -30,6 +30,11 @@ export class DashboardComponent implements OnInit {
     firebase.auth().onAuthStateChanged(
       (user) => {
         console.log('onAuthStateChanged_user..... ', user);
+
+        // the following two lines will return object that contains claims of current authenticated user
+        // user.getIdTokenResult().then((res) => {console.log('onAuthStateChanged_getIdTokenResult..... ', res)});
+        // user.getIdToken().then((res) => {console.log('onAuthStateChanged_getIdToken..... ', res)});
+
         this.isAuth = !!user;
       },
       (err) => {
