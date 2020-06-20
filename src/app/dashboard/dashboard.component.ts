@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, NgModel } from '@angular/forms';
 
 @Component({
   selector: 'dashboard',
@@ -145,5 +145,11 @@ export class DashboardComponent implements OnInit {
     firebase.firestore().collection('shared').doc(idx).delete()
     .then((res) => {console.log('onDeleteSharedData_res..... ', res)})
     .catch((err) => {console.error('onDeleteSharedData_err..... ', err)});
+  }
+
+  onSetAdmin(input: NgModel) {
+    console.log('onSetAdmin_input..... ', input.control.value);
+
+
   }
 }
