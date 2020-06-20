@@ -12,6 +12,10 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class DashboardComponent implements OnInit {
   isAuth: boolean = false;
   outlineData: any[] = [];
+  user: {uid: string, admin: boolean} = {
+    uid: null,
+    admin: false
+  };
 
   authForm: FormGroup = new FormGroup({
     'user_email': new FormControl(null),
@@ -35,31 +39,32 @@ export class DashboardComponent implements OnInit {
         // user.getIdTokenResult().then((res) => {console.log('onAuthStateChanged_getIdTokenResult..... ', res)});
         // user.getIdToken().then((res) => {console.log('onAuthStateChanged_getIdToken..... ', res)});
 
+        this.user.uid = user ? user.uid : null;
         this.isAuth = !!user;
+
+        // this way is not subscription, it won't trigger anything when new data is added
+        // firebase.firestore().collection('outline_data').get().then(res => {res.docs.map(doc => {console.log('ngOnInit_doc..... ', doc.data())})});
+
+        // onSnapshot will trigger everytime there is new changes in data (add, delete, etc)
+        firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').onSnapshot(
+          (snapshot) => {
+            console.log('onSnapshot_snapshot..... ', snapshot);
+            this.outlineData = [];
+
+            snapshot.docs.map((doc) => {
+              console.log('onInit_snapshot_doc..... ', doc.data());
+
+              this.outlineData.push({...{idx: doc.id}, ...doc.data()});
+            })
+          },
+          (err) => {console.error('onSnapshot_err..... ', err)}
+        );
+
       },
       (err) => {
         console.error('err..... ', err);
       }
     );
-
-    // this way is not subscription, it won't trigger anything when new data is added
-    // firebase.firestore().collection('outline_data').get().then(res => {res.docs.map(doc => {console.log('ngOnInit_doc..... ', doc.data())})});
-
-    // onSnapshot will trigger everytime there is new changes in data (add, delete, etc)
-    firebase.firestore().collection('outline_data').onSnapshot(
-      (snapshot) => {
-        // console.log('onSnapshot_snapshot..... ', snapshot);
-        this.outlineData = [];
-
-        snapshot.docs.map((doc) => {
-          console.log('onInit_snapshot_doc..... ', doc.data());
-
-          this.outlineData.push({...{idx: doc.id}, ...doc.data()});
-        })
-      },
-      (err) => {console.error('onSnapshot_err..... ', err)}
-    );
-
   }
 
   onSignIn() {
@@ -69,6 +74,7 @@ export class DashboardComponent implements OnInit {
     )
     .then((res) => {
       console.log('signin_res..... ', res);
+      this.user.uid = res.user.uid;
     })
     .catch((err) => {
       console.error('signin_err..... ', err);
@@ -91,7 +97,7 @@ export class DashboardComponent implements OnInit {
   onAddData() {
     console.log('onAddData..... ', this.outlineDataForm);
 
-    firebase.firestore().collection('outline_data').add({
+    firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').add({
       outline: this.outlineDataForm.get('outline').value,
       description: this.outlineDataForm.get('description').value
     })
@@ -101,7 +107,7 @@ export class DashboardComponent implements OnInit {
 
   onDeleteData(idx: string) {
     console.log('idx..... ', idx);
-    firebase.firestore().collection('outline_data').doc(idx).delete()
+    firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').doc(idx).delete()
     .then((res) => {console.log('onDeleteData_res..... ', res)})
     .catch((err) => {console.log('onDeleteData_err..... ', err)});
   }
