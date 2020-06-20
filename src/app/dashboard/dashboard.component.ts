@@ -12,6 +12,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class DashboardComponent implements OnInit {
   isAuth: boolean = false;
   outlineData: any[] = [];
+  sharedData: any[] = [];
   user: {uid: string, admin: boolean} = {
     uid: null,
     admin: false
@@ -48,11 +49,11 @@ export class DashboardComponent implements OnInit {
         // onSnapshot will trigger everytime there is new changes in data (add, delete, etc)
         firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').onSnapshot(
           (snapshot) => {
-            console.log('onSnapshot_snapshot..... ', snapshot);
+            // console.log('onSnapshot_snapshot..... ', snapshot);
             this.outlineData = [];
 
             snapshot.docs.map((doc) => {
-              console.log('onInit_snapshot_doc..... ', doc.data());
+              // console.log('onInit_snapshot_doc..... ', doc.data());
 
               this.outlineData.push({...{idx: doc.id}, ...doc.data()});
             })
@@ -60,6 +61,21 @@ export class DashboardComponent implements OnInit {
           (err) => {console.error('onSnapshot_err..... ', err)}
         );
 
+        // load shared data
+        firebase.firestore().collection('shared').onSnapshot(
+          (snapshot) => {
+            console.log('shared_onSnapshot_snapshot..... ', snapshot);
+
+            this.sharedData = [];
+
+            snapshot.docs.map((doc) => {
+              console.log('onInit_shared_snapshot_doc..... ', doc.data());
+
+              this.sharedData.push({...{idx: doc.id}, ...doc.data()});
+            })
+          },
+          (err) => {console.error('shared_onSnapshot_err..... ', err)}
+        );
       },
       (err) => {
         console.error('err..... ', err);
@@ -99,7 +115,8 @@ export class DashboardComponent implements OnInit {
 
     firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').add({
       outline: this.outlineDataForm.get('outline').value,
-      description: this.outlineDataForm.get('description').value
+      description: this.outlineDataForm.get('description').value,
+      creator: this.user.uid
     })
     .then((res) => {console.log('onAddData_res..... ', res)})
     .catch((err) => {console.error('onAddData_err..... ', err)});
@@ -110,5 +127,23 @@ export class DashboardComponent implements OnInit {
     firebase.firestore().collection('submitted').doc(this.user.uid).collection('outline_data').doc(idx).delete()
     .then((res) => {console.log('onDeleteData_res..... ', res)})
     .catch((err) => {console.log('onDeleteData_err..... ', err)});
+  }
+
+  onAddSharedData() {
+    firebase.firestore().collection('shared').add({
+      outline: this.outlineDataForm.get('outline').value,
+      description: this.outlineDataForm.get('description').value,
+      creator: this.user.uid
+    })
+    .then((res) => {console.log('onAddSharedData_res..... ', res)})
+    .catch((err) => {console.error('onAddSharedData_err..... ', err)});
+  }
+
+  onDeleteSharedData(idx: string) {
+    console.log('shared_idx..... ', idx);
+
+    firebase.firestore().collection('shared').doc(idx).delete()
+    .then((res) => {console.log('onDeleteSharedData_res..... ', res)})
+    .catch((err) => {console.error('onDeleteSharedData_err..... ', err)});
   }
 }
