@@ -29,3 +29,9 @@ hr {
   border: 1px solid #ffc107;
 }
 
+input {
+  &:focus {
+    border-color: #ffc107 !important;
+    box-shadow: 0px 0px 5px 0.1rem  #ffc107 !important;
+  }
+}

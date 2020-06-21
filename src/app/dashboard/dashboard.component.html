@@ -59,8 +59,8 @@
   </div>
   <div class="d-flex mx-2 my-4" *ngIf="!user.admin">
     <div class="form-group d-flex">
-      <input id="admin-email" type="email" class="form-control mx-2" ngModel #adminEmail="ngModel" placeholder="enter email address..... ">
-      <a type="button" class="btn btn-success mx-2 w-100" (click)="onSetAdmin(adminEmail)"><i class="fas fa-user pr-2 py-auto"></i>Set as Admin</a>
+      <input id="admin-email" type="email" class="form-control mx-2 col-8" ngModel #adminEmail="ngModel">
+      <a type="button" class="btn btn-success mx-2 w-100 col-4" (click)="onSetAdmin(adminEmail)"><i class="fas fa-user pr-2 py-auto"></i>Admin</a>
     </div>
   </div>
 
@@ -85,7 +85,7 @@
     </div>
   </div>
   <hr>
-  <h5>Shared Data</h5>
+  <h5>Shared Data</h5><small class="text-danger">*Only admin can delete</small>
   <div *ngIf="sharedData.length !== 0">
     <div class="row">
       <ng-container *ngFor="let data of sharedData"> <!-- ToDo: trackBy works only with Array NOT with Observable -->
