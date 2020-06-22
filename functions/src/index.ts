@@ -8,6 +8,12 @@ export const setAdminRole = functions.https.onCall((data, context) => {
   console.log('setAdminRole_data..... ', data);
   console.log('setAdminRole_context..... ', context);
 
+  if (context.auth?.token.admin !== true) {
+    return {
+      message: `Only Admin can perform this operation. ${context.auth?.token.email} is NOT an Admin!`
+    };
+  };
+
   return admin.auth().getUserByEmail(data.email)
           .then((user) => {
             console.log('setAdminRole_user..... ', user);
