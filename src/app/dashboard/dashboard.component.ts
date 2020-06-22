@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/functions';
 import { FormGroup, FormControl, NgModel } from '@angular/forms';
 
 @Component({
@@ -13,8 +14,9 @@ export class DashboardComponent implements OnInit {
   isAuth: boolean = false;
   outlineData: any[] = [];
   sharedData: any[] = [];
-  user: {uid: string, admin: boolean} = {
+  user: {uid: string, email: string, admin: boolean} = {
     uid: null,
+    email: null,
     admin: false
   };
 
@@ -40,8 +42,20 @@ export class DashboardComponent implements OnInit {
         // user.getIdTokenResult().then((res) => {console.log('onAuthStateChanged_getIdTokenResult..... ', res)});
         // user.getIdToken().then((res) => {console.log('onAuthStateChanged_getIdToken..... ', res)});
 
-        this.user.uid = user ? user.uid : null;
         this.isAuth = !!user;
+
+        if (user) {
+          this.user.uid = user.uid;
+          this.user.email = user.email;
+
+          user.getIdTokenResult()
+          .then((res) => {
+            console.log('onAuthStateChanged_getIdTokenResult_res..... ', res);
+
+            this.user.admin = res.claims.admin;
+          })
+          .catch((err) => {console.error('onAuthStateChanged_getIdTokenResult_err..... ', err)})
+        }
 
         // this way is not subscription, it won't trigger anything when new data is added
         // firebase.firestore().collection('outline_data').get().then(res => {res.docs.map(doc => {console.log('ngOnInit_doc..... ', doc.data())})});
@@ -150,6 +164,9 @@ export class DashboardComponent implements OnInit {
   onSetAdmin(input: NgModel) {
     console.log('onSetAdmin_input..... ', input.control.value);
 
-
+    const func = firebase.functions().httpsCallable('setAdminRole');
+    func({ email: this.user.email })    // because in 'setAdminRole' function, we extract 'email' property frm 'data' (as in 'data.email'), we need to set this object
+    .then((res) => {console.log('onSetAdmin_res..... ', res)})
+    .catch((err) => {console.log('onSetAdmin_err..... ', err)});
   }
 }
